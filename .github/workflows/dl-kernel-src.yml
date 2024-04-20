@@ -72,7 +72,7 @@ jobs:
         overwrite: true
 
     - name: Tag
-      if: ${{ github.event.inputs.tag_or_release }} == tag
+      if: ${{ github.event.inputs.tag_or_release }} == 'tag'
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}_${{ github.event.inputs.tag }}
@@ -82,10 +82,10 @@ jobs:
           ./android-kernel/repo.tar.gz
 
     - name: Release
-      if: ${{ github.event.inputs.tag_or_release }} == release
+      if: ${{ github.event.inputs.tag_or_release }} == 'release'
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}_-${{ github.event.inputs.release }}
+        tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}_${{ github.event.inputs.release }}
         files: |
           ./android-kernel/common.tar.gz
           ./android-kernel/android12-5.10-2024-03.tar.gz
