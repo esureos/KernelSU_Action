@@ -4,15 +4,31 @@ on:
   # push:
   workflow_dispatch:
     inputs:
-      release:
-        description: "release-*"
+      config:
+        description: 'Choose a config.env'
         required: false
-        default: release-*
-        type: string
+        default: 'config.env' # 默认选择标签
+        options:
+          - 'config.env'
+          - 'config.env.gki_12510'
+        type: choice
+      tag_or_release:
+        description: 'Choose whether to use a Tag or a Release'
+        required: false
+        default: 'tag' # 默认选择标签
+        options:
+          - 'tag'
+          - 'release'
+        type: choice
       tag:
         description: 'v*.*.*'
         required: false
         default: v*.*.*
+        type: string
+      release:
+        description: "release-*"
+        required: false
+        default: release-*
         type: string
 
 jobs:
@@ -25,42 +41,51 @@ jobs:
     - uses: actions/checkout@v4
       #with:
       #  ref: 
-    - name: download source code
+    - name: Read the Configuration
+      run: |
+        CONFIG_ENV=${{ github.event.inputs.config }}
+        echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_CONFIG=$(cat $CONFIG_ENV | grep -w "KERNEL_CONFIG" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+
+    - name: Download Source Code
       id: code
       run: |
-        CONFIG_ENV=config.env
         sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get install repo -y
         cd $GITHUB_WORKSPACE
         mkdir android-kernel && cd android-kernel
-        git clone --depth=1 https://android.googlesource.com/kernel/common -b android12-5.10-2024-03
+        git clone --depth=1 ${{ env.KERNEL_SOURCE }} -b ${{ env.KERNEL_SOURCE_BRANCH }}
         tar -zcpvf common.tar.gz common
-        aria2c https://android.googlesource.com/kernel/common/+archive/refs/heads/android12-5.10-2024-03.tar.gz -o android12-5.10-2024-03.tar.gz
+        aria2c ${{ env.KERNEL_SOURCE_BRANCH }}/+archive/refs/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
         mkdir ../repo && cd ../repo
-        repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android12-5.10-2024-03 && repo sync
+        repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-${{ env.KERNEL_SOURCE_BRANCH }} && repo sync
         cd .. && tar -zcpvf repo.tar.gz repo
-    - name: upload artifacts
+
+    - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: android12-5.10-2024-03
+        name: ${{ env.KERNEL_SOURCE_BRANCH }}
         path: |
           ./android-kernel/common.tar.gz
           ./android-kernel/android12-5.10-2024-03.tar.gz
           ./android-kernel/repo.tar.gz
         overwrite: true
-    - name: Release
+
+    - name: Tag
+      if: ${{ github.event.inputs.tag_or_release }} == tag
       uses: softprops/action-gh-release@v2
-      if: ${{ github.event.inputs.release }} == release-*
       with:
-        tag_name: GKI_Kernel_Source_Code-${{ github.event.inputs.release }}
+        tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}_${{ github.event.inputs.tag }}
         files: |
           ./android-kernel/common.tar.gz
           ./android-kernel/android12-5.10-2024-03.tar.gz
           ./android-kernel/repo.tar.gz
+
     - name: Release
+      if: ${{ github.event.inputs.tag_or_release }} == release
       uses: softprops/action-gh-release@v2
-      if: ${{ github.event.inputs.tag }} == v*.*.*
       with:
-        tag_name: GKI_Kernel_Source_Code-${{ github.event.inputs.tag }}
+        tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}_-${{ github.event.inputs.release }}
         files: |
           ./android-kernel/common.tar.gz
           ./android-kernel/android12-5.10-2024-03.tar.gz
