@@ -59,7 +59,8 @@ jobs:
         aria2c ${{ env.KERNEL_SOURCE }}/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
         mkdir repo && cd repo
         repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-${{ env.KERNEL_SOURCE_BRANCH }} && repo sync
-        cd .. && tar -zcpvf repo.tar.gz repo
+        # cd .. && tar -zcpvf repo.tar.gz repo
+        cd .. && tar -zcpvf - repo |split -d -b 1000m - repo.tar.gz.
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
@@ -68,7 +69,7 @@ jobs:
         path: |
           ./android-kernel/common.tar.gz
           ./android-kernel/android12-5.10-2024-03.tar.gz
-          ./android-kernel/repo.tar.gz
+          ./android-kernel/repo.tar.gz.*
         overwrite: true
 
     - name: Tag
