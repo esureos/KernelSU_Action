@@ -10,8 +10,8 @@ on:
         default: false
         type: boolean
       tags:
-        description: ''
-        required: true
+        description: 'v*.*.*'
+        required: false
         type: boolean
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
         cd .. && tar -zcvf repo.tar.gz repo
     - name: Generate release tag
       id: tag
-      run: echo "::set-output name=release_tag::GKI_KERNEL_SOURCE_CODE $(date +"%Y.%m.%d")"
+      run: echo "::set-output name=release_tag::GKI_KERNEL_SOURCE_CODE-$(date +"%Y.%m.%d")"
     - name: upload artifacts
       uses: actions/upload-artifact@v4
       with:
