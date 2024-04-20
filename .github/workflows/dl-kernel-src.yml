@@ -30,9 +30,9 @@ jobs:
       id: determine_changed_file
       if: github.event_name == 'push'
       run: |
-        if [[ $(git diff --name-only $HEAD^ $HEAD) =~ "config.env" ]]; then
+        if [[ $(git diff --name-only HEAD^ HEAD) =~ "config.env" ]]; then
           echo "::set-output name=changed_file::config.env"
-        elif [[ $(git diff --name-only $HEAD^ $HEAD) =~ "config.properties.gki_12510" ]]; then
+        elif [[ $(git diff --name-only HEAD^ HEAD) =~ "config.properties.gki_12510" ]]; then
           echo "::set-output name=changed_file::config.properties.gki_12510"
         fi
     - name: Read the Configuration
