@@ -25,6 +25,7 @@ jobs:
     - name: download source code
       id: code
       run: |
+        apt update && apt upgrade -y && apt install repo -y
         cd $GITHUB_WORKSPACE
         mkdir android-kernel && cd android-kernel
         git clone --depth=1 https://android.googlesource.com/kernel/common -b android12-5.10-2024-03
@@ -33,8 +34,11 @@ jobs:
         mkdir ../repo && cd ../repo
         repo init --depth =1 -u https://android.googlesource.com/kernel/manifest -b common-android12-5.10-2024-03 && repo sync
         cd .. && tar -zcvf repo.tar.gz repo
+    - name: Generate release tag
+      id: tag
+      run: echo "::set-output name=release_tag::GKI_KERNEL_SOURCE_CODE $(date +"%Y.%m.%d")"
     - name: upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: android12-5.10-2024-03
         path: |
@@ -45,7 +49,7 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ github.event.inputs.tags }}
+        tag_name: ${{ steps.tag.outputs.release_tag }}
         files: |
           ./android-kernel/common.tar.gz
           ./android-kernel/android12-5.10-2024-03.tar.gz
