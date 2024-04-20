@@ -4,23 +4,15 @@ on:
   # push:
   workflow_dispatch:
     inputs:
-      tag_or_release:
-        description: 'Choose whether to use a Tag or a Release'
-        required: false
-        default: 'tag' # 默认选择标签
-        options:
-          - 'tag'
-          - 'release'
-        type: choice
       release:
-        description: "Release"
+        description: "release-*"
         required: false
-        default: false
+        default: release-*
         type: string
       tag:
         description: 'v*.*.*'
         required: false
-        default: false
+        default: v*.*.*
         type: string
 
 jobs:
@@ -36,6 +28,7 @@ jobs:
     - name: download source code
       id: code
       run: |
+        CONFIG_ENV=config.env
         sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get install repo -y
         cd $GITHUB_WORKSPACE
         mkdir android-kernel && cd android-kernel
@@ -56,18 +49,18 @@ jobs:
         overwrite: true
     - name: Release
       uses: softprops/action-gh-release@v2
-      if: ${{ github.event.inputs.release }} == true
+      if: ${{ github.event.inputs.release }} == release-*
       with:
-        tag_name: ${{ github.event.inputs.release }}
+        tag_name: GKI_Kernel_Source_Code-${{ github.event.inputs.release }}
         files: |
           ./android-kernel/common.tar.gz
           ./android-kernel/android12-5.10-2024-03.tar.gz
           ./android-kernel/repo.tar.gz
     - name: Release
       uses: softprops/action-gh-release@v2
-      if: ${{ github.event.inputs.tag }} == true
+      if: ${{ github.event.inputs.tag }} == v*.*.*
       with:
-        tag_name: ${{ github.event.inputs.tag }}
+        tag_name: GKI_Kernel_Source_Code-${{ github.event.inputs.tag }}
         files: |
           ./android-kernel/common.tar.gz
           ./android-kernel/android12-5.10-2024-03.tar.gz
