@@ -1,6 +1,7 @@
 name: Download Kernel Source Code
 
 on:
+  push:
   workflow_dispatch:
     inputs:
       release:
