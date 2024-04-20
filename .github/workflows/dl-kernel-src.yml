@@ -11,16 +11,17 @@ on:
         options:
           - 'tag'
           - 'release'
+        type: boolean
       release:
         description: "Release"
         required: true
-        #default: false
-        type: boolean
+        default: false
+        #type: boolean
       tags:
         description: 'v*.*.*'
         required: true
-        #default: false
-        type: boolean
+        default: false
+        #type: boolean
 
 jobs:
   download:
