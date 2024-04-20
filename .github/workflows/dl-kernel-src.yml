@@ -57,7 +57,7 @@ jobs:
         git clone --depth=1 ${{ env.KERNEL_SOURCE }} -b ${{ env.KERNEL_SOURCE_BRANCH }}
         tar -zcpvf common.tar.gz common
         aria2c ${{ env.KERNEL_SOURCE }}/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
-        mkdir ../repo && cd ../repo
+        mkdir repo && cd repo
         repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-${{ env.KERNEL_SOURCE_BRANCH }} && repo sync
         cd .. && tar -zcpvf repo.tar.gz repo
 
