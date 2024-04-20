@@ -1,7 +1,10 @@
 name: Download Kernel Source Code
 
 on:
-  # push:
+  push:
+    paths:
+      - 'config.env' # 监听指定文件的修改
+      - 'config.properties.gki_12510' # 监听另一个文件的修改
   workflow_dispatch:
     inputs:
       config:
@@ -24,8 +27,15 @@ jobs:
       with:
         ref: main
     - name: Read the Configuration
+      if: github.event_name == 'workflow_dispatch'
       run: |
         CONFIG_ENV=${{ github.event.inputs.config }}
+        echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+    - name: Read the Configuration
+      if: github.event_name == 'push' && contains(github.event.paths, 'config.env') || contains(github.event.paths, 'config.properties.gki_12510')
+      run: |
+        CONFIG_ENV=$(echo ${{ github.event.paths }} | grep -Eo 'config\.env|config\.properties\.gki_12510' | head -1)
         echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
 
