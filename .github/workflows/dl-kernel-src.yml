@@ -26,6 +26,9 @@ jobs:
         git clone --depth=1 https://android.googlesource.com/kernel/common -b android12-5.10-2024-03
         tar -zcvf common.tar.gz common
         aria2c https://android.googlesource.com/kernel/common/+archive/refs/heads/android12-5.10-2024-03.tar.gz -o android12-5.10-2024-03.tar.gz
+        mkdir ../repo && cd ../repo
+        repo init --depth =1 -u https://android.googlesource.com/kernel/manifest -b common-android12-5.10-2024-03 && repo sync
+        cd .. && tar -zcvf repo.tar.gz repo
     - name: upload artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -33,6 +36,7 @@ jobs:
         path: |
           ./android-kernel/common.tar.gz
           ./android-kernel/android12-5.10-2024-03.tar.gz
+          ./android-kernel/repo.tar.gz
         overwrite: true
     - name: Release
       uses: softprops/action-gh-release@v2
@@ -40,3 +44,4 @@ jobs:
         files: |
           ./android-kernel/common.tar.gz
           ./android-kernel/android12-5.10-2024-03.tar.gz
+          ./android-kernel/repo.tar.gz
