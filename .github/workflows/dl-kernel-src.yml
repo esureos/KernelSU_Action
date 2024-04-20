@@ -25,14 +25,14 @@ jobs:
     - name: download source code
       id: code
       run: |
-        sudo apt update && sudo apt upgrade -y && sudo apt install repo -y
+        sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get install repo -y
         cd $GITHUB_WORKSPACE
         mkdir android-kernel && cd android-kernel
         git clone --depth=1 https://android.googlesource.com/kernel/common -b android12-5.10-2024-03
         tar -zcvf common.tar.gz common
         aria2c https://android.googlesource.com/kernel/common/+archive/refs/heads/android12-5.10-2024-03.tar.gz -o android12-5.10-2024-03.tar.gz
         mkdir ../repo && cd ../repo
-        repo init --depth =1 -u https://android.googlesource.com/kernel/manifest -b common-android12-5.10-2024-03 && repo sync
+        repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android12-5.10-2024-03 && repo sync
         cd .. && tar -zcvf repo.tar.gz repo
     - name: Generate release tag
       id: tag
