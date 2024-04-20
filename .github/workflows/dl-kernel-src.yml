@@ -27,4 +27,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: android12-5.10-2024-03
-        path: $GITHUB_WORKSPACE/android-kernel/common
+        path: ./android-kernel/common
