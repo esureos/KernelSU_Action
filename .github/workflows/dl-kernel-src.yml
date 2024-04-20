@@ -23,12 +23,12 @@ on:
       tag:
         description: 'v*.*.*'
         required: false
-        default: v*.*.*
+        default: ''
         type: string
       release:
         description: "release-*"
         required: false
-        default: release-*
+        default: ''
         type: string
 
 jobs:
@@ -52,24 +52,23 @@ jobs:
       id: code
       run: |
         sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get install repo -y
-        cd $GITHUB_WORKSPACE
-        mkdir android-kernel && cd android-kernel
-        git clone --depth=1 ${{ env.KERNEL_SOURCE }} -b ${{ env.KERNEL_SOURCE_BRANCH }}
-        tar -zcpvf common.tar.gz common
+        mkdir $GITHUB_WORKSPACE/android-kernel && cd $GITHUB_WORKSPACE/android-kernel
+        git clone --depth=1 ${{ env.KERNEL_SOURCE }}.git -b ${{ env.KERNEL_SOURCE_BRANCH }}
+        # tar -zcpvf common.tar.gz common
         aria2c ${{ env.KERNEL_SOURCE }}/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
         mkdir repo && cd repo
         repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-${{ env.KERNEL_SOURCE_BRANCH }} && repo sync
         # cd .. && tar -zcpvf repo.tar.gz repo
-        cd .. && tar -zcpvf - repo |split -d -b 1000m - repo.tar.gz.
+        # cd .. && tar -zcpvf - repo |split -d -b 1000m - repo.tar.gz.
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.KERNEL_SOURCE_BRANCH }}
         path: |
-          ./android-kernel/common.tar.gz
+          ./android-kernel/common
           ./android-kernel/android12-5.10-2024-03.tar.gz
-          ./android-kernel/repo.tar.gz.*
+          ./android-kernel/repo
         overwrite: true
 
     - name: Tag
@@ -78,9 +77,9 @@ jobs:
       with:
         tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}_${{ github.event.inputs.tag }}
         files: |
-          ./android-kernel/common.tar.gz
+          ./android-kernel/common
           ./android-kernel/android12-5.10-2024-03.tar.gz
-          ./android-kernel/repo.tar.gz
+          ./android-kernel/repo
 
     - name: Release
       if: ${{ github.event.inputs.tag_or_release }} == 'release'
@@ -88,6 +87,6 @@ jobs:
       with:
         tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}_${{ github.event.inputs.release }}
         files: |
-          ./android-kernel/common.tar.gz
+          ./android-kernel/common
           ./android-kernel/android12-5.10-2024-03.tar.gz
-          ./android-kernel/repo.tar.gz
+          ./android-kernel/repo
