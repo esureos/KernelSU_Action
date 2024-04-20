@@ -1,0 +1,30 @@
+name: Download Kernel Source Code
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "Release"
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  download:
+    permissions:
+      contents: write
+    name: Download by ${{ github.actor }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: download source code
+      id: code
+      run: |
+        cd $GITHUB_WORKSPACE/kernel_workspace
+        mkdir android-kernel && cd android-kernel
+        git clone --deptch=1 https://android.googlesource.com/kernel/common -b android12-5.10-2024-03
+    - name: upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: android12-5.10-2024-03
+        path: $GITHUB_WORKSPACE/kernel_workspace/android-kernel/common
