@@ -6,12 +6,12 @@ on:
     inputs:
       tag_or_release:
         description: 'Choose whether to use a Tag or a Release'
-        required: true
-        default: '' # 默认选择标签
+        required: false
+        default: 'tag' # 默认选择标签
         options:
-          - 'tag'
+          - 'tags'
           - 'release'
-        type: boolean
+        type: choice
       release:
         description: "Release"
         required: true
