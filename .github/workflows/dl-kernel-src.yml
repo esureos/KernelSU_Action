@@ -25,7 +25,7 @@ jobs:
     - name: download source code
       id: code
       run: |
-        apt update && apt upgrade -y && apt install repo -y
+        sudo apt update && sudo apt upgrade -y && sudo apt install repo -y
         cd $GITHUB_WORKSPACE
         mkdir android-kernel && cd android-kernel
         git clone --depth=1 https://android.googlesource.com/kernel/common -b android12-5.10-2024-03
