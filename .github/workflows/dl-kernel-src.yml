@@ -6,7 +6,7 @@ on:
     inputs:
       config:
         description: 'Choose a config.env'
-        required: false
+        required: true
         default: 'config.env' # 默认选择标签
         options:
           - 'config.env'
