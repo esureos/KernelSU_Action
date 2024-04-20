@@ -65,9 +65,3 @@ jobs:
         tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}
         files: |
           ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
-   - name: Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}
-        files: |
-          ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
