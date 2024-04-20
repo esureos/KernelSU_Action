@@ -24,18 +24,19 @@ jobs:
         cd $GITHUB_WORKSPACE
         mkdir android-kernel && cd android-kernel
         git clone --depth=1 https://android.googlesource.com/kernel/common -b android12-5.10-2024-03
-        tar -zcf common
+        tar -zcvf common.tar.gz common
         aria2c https://android.googlesource.com/kernel/common/+archive/refs/heads/android12-5.10-2024-03.tar.gz -o android12-5.10-2024-03.tar.gz
     - name: upload artifacts
       uses: actions/upload-artifact@v3
       with:
         name: android12-5.10-2024-03
         path: |
-          ./android-kernel/common
-          ./android-kernel/
+          ./android-kernel/common.tar.gz
+          ./android-kernel/android12-5.10-2024-03.tar.gz
         overwrite: true
     - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            android12-5.10-2024-03.tar.gz
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          ./android-kernel/common.tar.gz
+          ./android-kernel/android12-5.10-2024-03.tar.gz
