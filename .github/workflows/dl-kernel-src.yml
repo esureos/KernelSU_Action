@@ -10,8 +10,8 @@ on:
         default: false
         type: boolean
       tags:
-        description: 'Test scenario tags'
-        required: false
+        description: ''
+        required: true
         type: boolean
 
 jobs:
