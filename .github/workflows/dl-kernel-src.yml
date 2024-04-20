@@ -7,12 +7,12 @@ on:
       release:
         description: "Release"
         required: true
-        default: false
-        type: boolean
+        # default: false
+        # type: boolean
       tags:
         description: 'v*.*.*'
-        required: false
-        type: boolean
+        required: true
+        # type: boolean
 
 jobs:
   download:
