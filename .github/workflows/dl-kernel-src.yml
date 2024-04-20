@@ -16,12 +16,12 @@ on:
         description: "Release"
         required: false
         default: false
-        type: boolean
+        type: string
       tag:
         description: 'v*.*.*'
         required: false
         default: false
-        type: boolean
+        type: string
 
 jobs:
   download:
