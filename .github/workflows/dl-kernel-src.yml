@@ -9,17 +9,17 @@ on:
         required: false
         default: 'tag' # 默认选择标签
         options:
-          - 'tags'
+          - 'tag'
           - 'release'
         type: choice
       release:
         description: "Release"
-        required: true
+        required: false
         default: false
         #type: boolean
-      tags:
+      tag:
         description: 'v*.*.*'
-        required: true
+        required: false
         default: false
         #type: boolean
 
