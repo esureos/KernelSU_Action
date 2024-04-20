@@ -10,7 +10,7 @@ on:
         default: 'config.env' # 默认选择标签
         options:
           - 'config.env'
-          - 'config.env.gki_12510'
+          - 'config.properties.gki_12510'
         type: choice
       tag_or_release:
         description: 'Choose whether to use a Tag or a Release'
