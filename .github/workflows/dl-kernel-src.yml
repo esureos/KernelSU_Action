@@ -9,6 +9,10 @@ on:
         required: true
         default: false
         type: boolean
+      tags:
+        description: 'Test scenario tags'
+        required: false
+        type: boolean
 
 jobs:
   download:
@@ -41,7 +45,7 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: $(GKI-Kernel-Src date +"%Y.%m.%d")"
+        tag_name: ${{ github.event.inputs.tags }}
         files: |
           ./android-kernel/common.tar.gz
           ./android-kernel/android12-5.10-2024-03.tar.gz
