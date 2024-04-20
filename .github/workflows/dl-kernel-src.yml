@@ -8,12 +8,12 @@ on:
         description: "Release"
         required: true
         default: false
-        # type: boolean
+        type: boolean
       tags:
         description: 'v*.*.*'
         required: true
         default: false
-        # type: boolean
+        type: boolean
 
 jobs:
   download:
