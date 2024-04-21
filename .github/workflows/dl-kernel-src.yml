@@ -86,7 +86,7 @@ jobs:
           echo "GITHUB_ENV=config.gki.env" >> $GITHUB_ENV
         fi
           echo "No File Changed, Use Default Config"
-        CONFIG_ENV=config.env
+          CONFIG_ENV=config.env
         echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
     - name: Read the Configuration
@@ -109,7 +109,6 @@ jobs:
         git clone --depth=1 ${{ env.KERNEL_SOURCE }}.git -b ${{ env.KERNEL_SOURCE_BRANCH }} ${{ env.KERNEL_SOURCE_BRANCH }}
         aria2c ${{ env.KERNEL_SOURCE }}/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
         echo "dl_complete=true" >> $GITHUB_OUTPUT
-        cat ${{ steps.dl.outputs.dl_complete }}
 
     - name: Check if remote branch exists
       if: ${{ github.event.inputs.push == 'true' && steps.dl.outputs.dl_complete == 'true' }}
@@ -120,9 +119,9 @@ jobs:
         git init
         git remote add origin https://esureos:${{ secrets.WORKFLOW_TOKEN }}@github.com/esureos/KernelSU_Action.git
         if git ls-remote --heads https://esureos:${{ secrets.WORKFLOW_TOKEN }}@github.com/esureos/KernelSU_Action.git ${{ env.KERNEL_SOURCE_BRANCH }} | grep -q refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}; then
-          echo "::set-output name=branch_exists::true"
+          echo "branch_exists=true" >> $GITHUB_OUTPUT
         else
-          echo "::set-output name=branch_exists::false"
+          echo "branch_exists=false" >> $GITHUB_OUTPUT
         fi
     - name: Pull changes if branch exists
       id: pull
