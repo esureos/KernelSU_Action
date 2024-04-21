@@ -32,9 +32,9 @@ jobs:
       run: |
         latest_commit=$(git log --format=%H -1)
         parent_commit=$(git log --format=%H -1 $latest_commit^)
-        if [[ $(git diff $latest_commit -- config.env ) =~ "config.env" ]]; then
+        if [[ $(git diff 8ceac374c21fcf2964d1becfcb50d4c57561aa9f -- config.env ) =~ "config.env" ]]; then
           echo "::set-output name=changed_file::config.env"
-        elif [[ $(git diff $latest_commit -- config.properties.gki_12510) =~ "config.properties.gki_12510" ]]; then
+        elif [[ $(git diff 8ceac374c21fcf2964d1becfcb50d4c57561aa9f -- config.properties.gki_12510) =~ "config.properties.gki_12510" ]]; then
           echo "::set-output name=changed_file::config.properties.gki_12510"
         fi
 
