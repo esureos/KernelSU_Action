@@ -2,6 +2,8 @@ name: Download Kernel Source Code
 
 on:
   push:
+    branches:
+      - 'main'
     paths:
       - 'config.env' # 监听指定文件的修改
       - 'config.properties.gki_12510' # 监听另一个文件的修改
@@ -30,21 +32,25 @@ jobs:
       id: determine_changed_file
       if: github.event_name == 'push'
       run: |
-        if [[ $(git diff 8ceac374c21fcf2964d1becfcb50d4c57561aa9f -- config.env ) =~ "config.env" ]]; then
+        if [[ $(git diff --name-only HEAD^) =~ "config.env" ]]; then
           echo "::set-output name=changed_file::config.env"
-        elif [[ $(git diff 8ceac374c21fcf2964d1becfcb50d4c57561aa9f -- config.properties.gki_12510) =~ "config.properties.gki_12510" ]]; then
+        elif [[ $(git diff --name-only HEAD^) =~ "config.properties.gki_12510" ]]; then
           echo "::set-output name=changed_file::config.properties.gki_12510"
         fi
-
     - name: Read the Configuration
-      if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && steps.determine_changed_file.outputs.changed_file)
+      if: github.event_name == 'workflow_dispatch'
       run: |
         CONFIG_ENV=${{ github.event.inputs.config }}
         echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+    - name: Read the Configuration
+      if: (github.event_name == 'push' && steps.determine_changed_file.outputs.changed_file)
+      run: |
+        CONFIG_ENV=${{ steps.determine_changed_file.outputs.changed_file }}
+        echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
 
     - name: Download Source Code
-      if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && steps.determine_changed_file.outputs.changed_file)
       id: code
       run: |
         sudo apt-get update && sudo apt-get upgrade -y
@@ -52,7 +58,6 @@ jobs:
         aria2c ${{ env.KERNEL_SOURCE }}/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
 
     - name: Upload Artifacts
-      if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && steps.determine_changed_file.outputs.changed_file)
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.KERNEL_SOURCE_BRANCH }}
@@ -60,7 +65,6 @@ jobs:
           ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
 
     - name: Release
-      if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && steps.determine_changed_file.outputs.changed_file)
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}
