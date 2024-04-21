@@ -6,7 +6,7 @@ on:
       - 'main'
     paths:
       - 'config.env' # 监听指定文件的修改
-      - 'config.properties.gki_12510' # 监听另一个文件的修改
+      - 'config.gki12510.env' # 监听另一个文件的修改
   workflow_dispatch:
     inputs:
       config:
