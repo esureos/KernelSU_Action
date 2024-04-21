@@ -23,23 +23,25 @@ jobs:
       if: ${{ github.event.inputs.version }}
       run: |
         echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-    - name: Download Source Code
-      id: code
+    - name: Setup Environment
       run: |
+        cd $GITHUB_WORKSPACE
         sudo apt-get update && sudo apt-get upgrade -y
+        git config --global user.name 'esureos'
+        git config --global user.email 'etosercc@gmail.com'
+    - name: Download Source Code
+      run: |
+        mkdir android-kernel && cd android-kernel
         git clone --depth=1 https://android.googlesource.com/kernel/common.git -b ${{ env.KERNEL_SOURCE_BRANCH }} ${{ env.KERNEL_SOURCE_BRANCH }}
-        mkdir $GITHUB_WORKSPACE/android-kernel && cd $GITHUB_WORKSPACE/android-kernel
         aria2c https://android.googlesource.com/kernel/common/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
-    - name: Create and switch to new branch
-      if: ${{ github.event.inputs.version }}
-      run: |
-        git checkout -b ${{ env.KERNEL_SOURCE_BRANCH }}
-    - name: Add downloaded source code to the new branch
-      run: |
-        git add .
-        git commit -m "Add downloaded source code"
     - name: Push new branch to remote
       run: |
+        cd ${{ env.KERNEL_SOURCE_BRANCH }}
+        git remote rm origin
+        git remote add origin https://github.com/esureos/KernelSU_Action
+        git checkout -b ${{ env.KERNEL_SOURCE_BRANCH }}
+        git add .
+        git commit -m "Add downloaded source code"
         git push origin ${{ env.KERNEL_SOURCE_BRANCH }}
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
