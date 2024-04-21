@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       config:
-        description: 'Choose a env Config'
+        description: 'Choose a Env Config'
         required: false
         default: '' # 默认选择标签
         options:
@@ -25,17 +25,17 @@ on:
         default: '' # 默认选择标签
         type: string
       artifacts:
-        description: 'Input a Branche Name'
+        description: 'if Upload Artifacts'
         required: false
         default: '' # 默认选择标签
         type: string
       releases:
-        description: 'Input a Branche Name'
+        description: 'if Publish Release'
         required: false
         default: 'false' # 默认选择标签
         type: string
       push:
-        description: 'Input a Branche Name'
+        description: 'if Push a Branche'
         required: false
         default: 'false' # 默认选择标签
         options:
