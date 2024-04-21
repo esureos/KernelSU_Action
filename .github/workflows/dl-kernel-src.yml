@@ -80,6 +80,7 @@ jobs:
     - name: Set GITHUB_ENV based on changed file
       if: github.event_name == 'push'
       run: |
+        set -x
         CONFIG_ENV=config.env
         if git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep 'config.env'; then
           echo "GITHUB_ENV=config.env" >> $GITHUB_ENV
@@ -88,8 +89,8 @@ jobs:
         else
           echo "No File Changed, Use Default Config"
         fi
-        echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-        echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_SOURCE=$(cat $env.CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_SOURCE_BRANCH=$(cat $env.CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
     - name: Read the Configuration
       if: ${{ github.event.inputs.config != '' }}
       run: |
