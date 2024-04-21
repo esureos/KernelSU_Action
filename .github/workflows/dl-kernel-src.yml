@@ -107,7 +107,7 @@ jobs:
         # git config --global init.defaultBranch main
         # git init
         git remote set-url origin https://esureos:${{ secrets.WORKFLOW_TOKEN }}@github.com/esureos/KernelSU_Action.git
-        # git checkout -b ${{ env.KERNEL_SOURCE_BRANCH }}
+        # git checkout ${{ env.KERNEL_SOURCE_BRANCH }}
         git add .
         git commit -m "Add downloaded source code"
         git push origin ${{ env.KERNEL_SOURCE_BRANCH }}
