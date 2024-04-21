@@ -1,23 +1,8 @@
 name: Download Kernel Source Code
 
 on:
-  push:
-    branches:
-      - 'main'
-    paths:
-      - 'config.env' # 监听指定文件的修改
-      # - 'config.gki12510.env' # 监听另一个文件的修改
   workflow_dispatch:
     inputs:
-      config:
-        description: 'Choose a config.env'
-        required: false
-        default: '' # 默认选择标签
-        options:
-          - ''
-          - 'config.env'
-          - 'config.gki12510.env'
-        type: choice
       version:
         description: 'Input a Kernel Version'
         required: false
@@ -35,16 +20,6 @@ jobs:
       with:
         ref: main
     - name: Read the Configuration
-      if: github.event_name == 'push'
-      run: |
-        CONFIG_ENV=config.env
-        echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-    - name: Read the Configuration
-      if: if [[ -n ${{ github.event.inputs.config }} ]]; then
-      run: |
-        CONFIG_ENV=${{ github.event.inputs.config }}
-        echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-    - name: Read the Configuration
       if: if [[ -n ${{ github.event.inputs.version }} ]]; then
       run: |
         echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.version }}
@@ -53,18 +28,18 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get upgrade -y
         mkdir $GITHUB_WORKSPACE/android-kernel && cd $GITHUB_WORKSPACE/android-kernel
-        aria2c https://android.googlesource.com/kernel/common/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
+        aria2c https://android.googlesource.com/kernel/common/+archive/refs/heads/${{ KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ KERNEL_SOURCE_BRANCH }}.tar.gz
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ env.KERNEL_SOURCE_BRANCH }}
+        name: ${{ KERNEL_SOURCE_BRANCH }}
         path: |
-          ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
+          ./android-kernel/${{ KERNEL_SOURCE_BRANCH }}.tar.gz
 
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}
+        tag_name: ${{ KERNEL_SOURCE_BRANCH }}
         files: |
-          ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
+          ./android-kernel/${{ KERNEL_SOURCE_BRANCH }}.tar.gz
