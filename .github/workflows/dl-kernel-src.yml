@@ -102,7 +102,7 @@ jobs:
     - name: Push new branch to remote
       if: ${{ github.event.inputs.push }} == 'true'
       run: |
-        cd $GITHUB_WORKSPACE/android-kernel/common
+        cd $GITHUB_WORKSPACE/android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}
         rm -rf .git
         git config --global init.defaultBranch main
         git init
