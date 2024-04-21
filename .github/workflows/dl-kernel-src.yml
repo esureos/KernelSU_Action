@@ -46,9 +46,9 @@ jobs:
         echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
     - name: Read the Configuration
-      if: github.event_name == 'workflow_dispatch.version'
+      if: if [[ -n ${{ github.event.inputs.version }} ]]; then
       run: |
-        echo "KERNEL_SOURCE_BRANCH=$${{ github.event.inputs.version }}
+        echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.version }}
     - name: Download Source Code
       id: code
       run: |
