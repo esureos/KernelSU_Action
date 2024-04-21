@@ -27,16 +27,26 @@ jobs:
       id: code
       run: |
         sudo apt-get update && sudo apt-get upgrade -y
+        git clone --depth=1 https://android.googlesource.com/kernel/common.git -b ${{ env.KERNEL_SOURCE_BRANCH }} ${{ env.KERNEL_SOURCE_BRANCH }}
         mkdir $GITHUB_WORKSPACE/android-kernel && cd $GITHUB_WORKSPACE/android-kernel
         aria2c https://android.googlesource.com/kernel/common/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
-
+    - name: Create and switch to new branch
+      if: ${{ github.event.inputs.version }}
+      run: |
+        git checkout -b ${{ env.KERNEL_SOURCE_BRANCH }}
+    - name: Add downloaded source code to the new branch
+      run: |
+        git add .
+        git commit -m "Add downloaded source code"
+    - name: Push new branch to remote
+      run: |
+        git push origin ${{ env.KERNEL_SOURCE_BRANCH }}
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ${{ env.KERNEL_SOURCE_BRANCH }}
         path: |
           ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
-
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
