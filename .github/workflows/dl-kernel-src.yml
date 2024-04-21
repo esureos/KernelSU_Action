@@ -28,12 +28,18 @@ on:
         description: 'if Upload Artifacts'
         required: false
         default: 'true' # 默认选择标签
-        type: string
+        options:
+          - 'true'
+          - 'false'
+        type: choice
       releases:
         description: 'if Publish Release'
         required: false
         default: 'false' # 默认选择标签
-        type: string
+        options:
+          - 'true'
+          - 'false'
+        type: choice
       push:
         description: 'if Push a Branche'
         required: false
