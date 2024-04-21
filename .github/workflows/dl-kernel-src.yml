@@ -125,14 +125,20 @@ jobs:
           echo "::set-output name=branch_exists::false"
         fi
     - name: Pull changes if branch exists
+      id: pull
       if: steps.check_branch.outputs.branch_exists == 'true'
       run: |
         git fetch origin ${{ env.KERNEL_SOURCE_BRANCH }}
         git checkout ${{ env.KERNEL_SOURCE_BRANCH }}
         git pull origin ${{ env.KERNEL_SOURCE_BRANCH }}
-        git add .
-        git commit -m "Add downloaded source code"
-        git push origin ${{ env.KERNEL_SOURCE_BRANCH }}
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "changes_exist=true" >> GITHUB_OUTPUT
+          git add .
+          git commit -m "Add downloaded source code"
+          git push origin ${{ env.KERNEL_SOURCE_BRANCH }}
+        else
+          echo "changes_exist=false" >> GITHUB_OUTPUT
+        fi
     - name: Push new branch if not exists
       if: steps.check_branch.outputs.branch_exists == 'false'
       run: |
