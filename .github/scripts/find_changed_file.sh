@@ -15,7 +15,6 @@ for file in "${FILES_TO_CHECK[@]}"; do
         # 如果已经找到一个更改的文件，则退出循环
         if [ -n "$CHANGED_FILE" ]; then
             echo "列表中有多个文件更改。"
-            exit 1
         fi
         CHANGED_FILE=$file
     fi
