@@ -28,27 +28,8 @@ jobs:
     - uses: actions/checkout@v4
       with:
         ref: main
-    - name: Determine Changed File
-      id: determine_changed_file
-      if: github.event_name == 'push'
-      run: |
-        if git rev-parse --verify HEAD >/dev/null 2>&1; then
-          if [[ $(git diff --name-only HEAD^) =~ "config.env" ]]; then
-            echo "::set-output name=changed_file::config.env"
-          elif [[ $(git diff --name-only HEAD^) =~ "config.properties.gki_12510" ]]; then
-            echo "::set-output name=changed_file::config.properties.gki_12510"
-          fi
-        else
-          echo "No previous commit found."
-        fi
     - name: Read the Configuration
-      if: github.event_name == 'workflow_dispatch'
-      run: |
-        CONFIG_ENV=${{ github.event.inputs.config }}
-        echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-        echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-    - name: Read the Configuration
-      if: github.event_name == 'push'
+      if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
       run: |
         CONFIG_ENV=${{ github.event.inputs.config }}
         echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
