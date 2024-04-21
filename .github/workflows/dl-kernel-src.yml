@@ -112,7 +112,7 @@ jobs:
         cat ${{ output.dl_complete }}
 
     - name: Check if remote branch exists
-      if: ${{ github.event.inputs.push == 'true' && output.dl_complete == 'true' }}
+      if: ${{ github.event.inputs.push == 'true' && steps.dl.outputs.dl_complete == 'true' }}
       id: check_branch
       run: |
         cd $GITHUB_WORKSPACE/android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}
