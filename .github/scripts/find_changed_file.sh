@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 指定要检查的文件列表
-FILES_TO_CHECK=("config.env" "config.gki.env" "config.rubens.env" "config.ginkgo.env" "config.gki_lxcd.env" "config.rubens_lxcd.env" "config.ginkgo_lxcd.env")
+FILES_TO_CHECK=("config.env" "config.gki.env" "config.rubens.env" "config.ginkgo.env" "config.gki_ksu.env" "config.rubens_ksu.env" "config.rubens_ksu.env" "config.gki_lxcd.env" "config.rubens_lxcd.env" "config.ginkgo_lxcd.env" "config.gki_ksulxcd.env" "config.rubens_ksulxcd.env" "config.ginkgo_ksulxcd.env")
 
 # 获取最近一次提交中所有更改的文件列表
 CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD)
