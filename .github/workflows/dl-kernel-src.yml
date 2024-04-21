@@ -66,7 +66,7 @@ jobs:
     - name: Setup Environment
       run: |
         cd $GITHUB_WORKSPACE
-        sudo apt-get update && sudo apt-get upgrade -y
+        sudo apt-get update && sudo apt-get install git aria -y
         git config --global user.name 'esureos'
         git config --global user.email 'etosercc@gmail.com'
         git config --global init.defaultBranch main
@@ -94,12 +94,13 @@ jobs:
         echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
     - name: Read the Configuration
-      if: ${{ github.event.inputs.repos != '' && github.event.inputs.branches != '' }}
+      if: ${{ github.event.inputs.config }} && ${{ github.event.inputs.repos != '' && github.event.inputs.branches != '' }}
       run: |
         echo "KERNEL_SOURCE=${{ github.event.inputs.repos }}" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.branches }}" >> $GITHUB_ENV
     
     - name: Download Source Code
+      if: ${{ github.event.inputs.repos != '' && github.event.inputs.branches != '' }}
       run: |
         mkdir android-kernel && cd android-kernel
         git clone --depth=1 ${{ env.KERNEL_SOURCE }}.git -b ${{ env.KERNEL_SOURCE_BRANCH }} ${{ env.KERNEL_SOURCE_BRANCH }}
