@@ -13,7 +13,7 @@ on:
           - 'config.gki.env'
           - 'config.rubens.env'
           - 'config.ginkgo.env'
-        type: string
+        type: choice
       version:
         description: 'Input a Kernel Version'
         required: false
@@ -40,7 +40,7 @@ jobs:
         git config --global user.name 'esureos'
         git config --global user.email 'etosercc@gmail.com'
     - name: Checkout
-    - uses: actions/checkout@v4
+      uses: actions/checkout@v4
       with:
         token: ${{ secrets.WORKFLOW_TOKEN }}
         ref: main
