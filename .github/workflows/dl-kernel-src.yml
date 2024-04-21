@@ -15,7 +15,7 @@ on:
         default: 'config.env' # 默认选择标签
         options:
           - 'config.env'
-          - 'config.properties.gki_12510'
+          - 'config.gki12510.env'
         type: choice
 
 jobs:
