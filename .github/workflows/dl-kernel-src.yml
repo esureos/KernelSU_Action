@@ -100,14 +100,17 @@ jobs:
         echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.branches }}" >> $GITHUB_ENV
     
     - name: Download Source Code
+      id: dl
       if: ${{ github.event_name == 'push' || github.event.inputs.config != '' || github.event.inputs.repos != '' && github.event.inputs.branches != '' }}
       run: |
         mkdir android-kernel && cd android-kernel
         git clone --depth=1 ${{ env.KERNEL_SOURCE }}.git -b ${{ env.KERNEL_SOURCE_BRANCH }} ${{ env.KERNEL_SOURCE_BRANCH }}
         aria2c ${{ env.KERNEL_SOURCE }}/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
+        echo "dl_complete=true" >> $GITHUB_OUTPUT
+        cat ${{ output.dl_complete }}
 
     - name: Check if remote branch exists
-      if: ${{ github.event.inputs.push }} == 'true'
+      if: ${{ github.event.inputs.push == 'true' && output.dl_complete == 'true' }}
       id: check_branch
       run: |
         cd $GITHUB_WORKSPACE/android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}
