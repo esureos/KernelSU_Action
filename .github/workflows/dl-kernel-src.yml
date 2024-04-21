@@ -30,8 +30,6 @@ jobs:
       id: determine_changed_file
       if: github.event_name == 'push'
       run: |
-        latest_commit=$(git log --format=%H -1)
-        parent_commit=$(git log --format=%H -1 $latest_commit^)
         if [[ $(git diff 8ceac374c21fcf2964d1becfcb50d4c57561aa9f -- config.env ) =~ "config.env" ]]; then
           echo "::set-output name=changed_file::config.env"
         elif [[ $(git diff 8ceac374c21fcf2964d1becfcb50d4c57561aa9f -- config.properties.gki_12510) =~ "config.properties.gki_12510" ]]; then
