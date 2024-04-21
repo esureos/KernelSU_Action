@@ -11,16 +11,17 @@ on:
     inputs:
       config:
         description: 'Choose a config.env'
-        required: true
-        default: 'config.env' # 默认选择标签
+        required: false
+        default: '' # 默认选择标签
         options:
+          - ''
           - 'config.env'
           - 'config.gki12510.env'
         type: choice
       version:
         description: 'Input a Kernel Version'
-        required: true
-        default: 'android12' # 默认选择标签
+        required: false
+        default: 'android1-5.10-2024-03' # 默认选择标签
         type: string
 
 jobs:
