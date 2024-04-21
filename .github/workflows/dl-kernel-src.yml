@@ -50,7 +50,7 @@ jobs:
     - name: Read the Configuration
       if: github.event_name == 'push'
       run: |
-        CONFIG_ENV=${{ github.event.push.paths }}
+        CONFIG_ENV=${{ github.event.inputs.config }}
         echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
 
