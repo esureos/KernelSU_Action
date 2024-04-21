@@ -122,19 +122,19 @@ jobs:
     - name: Pull changes if branch exists
       if: steps.check_branch.outputs.branch_exists == 'true'
       run: |
-        git fetch origin ${{ github.event.inputs.branches }}
-        git checkout ${{ github.event.inputs.branches }}
-        git pull origin ${{ github.event.inputs.branches }}
+        git fetch origin ${{ env.KERNEL_SOURCE_BRANCH }}
+        git checkout ${{ env.KERNEL_SOURCE_BRANCH }}
+        git pull origin ${{ env.KERNEL_SOURCE_BRANCH }}
         git add .
         git commit -m "Add downloaded source code"
-        git push origin ${{ github.event.inputs.branches }}
+        git push origin ${{ env.KERNEL_SOURCE_BRANCH }}
     - name: Push new branch if not exists
       if: steps.check_branch.outputs.branch_exists == 'false'
       run: |
-        git checkout -b ${{ github.event.inputs.branches }}
+        git checkout -b ${{ env.KERNEL_SOURCE_BRANCH }}
         git add .
         git commit -m "Add downloaded source code"
-        git push origin ${{ github.event.inputs.branches }}
+        git push origin ${{ env.KERNEL_SOURCE_BRANCH }}
 
     - name: Upload Artifacts
       if: ${{ github.event.inputs.artifacts }} == 'true'
