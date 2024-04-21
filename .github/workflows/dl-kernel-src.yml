@@ -69,12 +69,24 @@ jobs:
         sudo apt-get update && sudo apt-get upgrade -y
         git config --global user.name 'esureos'
         git config --global user.email 'etosercc@gmail.com'
+        git config --global init.defaultBranch main
     - name: Checkout
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.WORKFLOW_TOKEN }}
         ref: main
         fetch-depth: 0 # 获取所有历史
+
+    - name: Set GITHUB_ENV based on changed file
+      if: github.event_name == 'push'
+      run: |
+        if git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -q 'config.env'; then
+          echo "GITHUB_ENV=config.env" >> $GITHUB_ENV
+        elif git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -q 'config.gki.env'; then
+          echo "GITHUB_ENV=config.gki.env" >> $GITHUB_ENV
+        fi
+        echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
     - name: Read the Configuration
       if: ${{ github.event.inputs.config }}
       run: |
@@ -86,22 +98,43 @@ jobs:
       run: |
         echo "KERNEL_SOURCE=${{ github.event.inputs.repos }}" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.branches }}" >> $GITHUB_ENV
-    - name: Set GITHUB_ENV based on changed file
-      if: github.event_name == 'push'
-      run: |
-        if git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -q 'config.env'; then
-          echo "GITHUB_ENV=config.env" >> $GITHUB_ENV
-        elif git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -q 'config.gki.env'; then
-          echo "GITHUB_ENV=config.gki.env" >> $GITHUB_ENV
-        fi
-        echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-        echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
     
     - name: Download Source Code
       run: |
         mkdir android-kernel && cd android-kernel
         git clone --depth=1 ${{ env.KERNEL_SOURCE }}.git -b ${{ env.KERNEL_SOURCE_BRANCH }} ${{ env.KERNEL_SOURCE_BRANCH }}
         aria2c ${{ env.KERNEL_SOURCE }}/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
+
+    - name: Check if remote branch exists
+      if: ${{ github.event.inputs.push }} == 'true'
+      id: check_branch
+      run: |
+        cd $GITHUB_WORKSPACE/android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}
+        rm -rf .git
+        git init
+        git remote add origin https://esureos:${{ secrets.WORKFLOW_TOKEN }}@github.com/esureos/KernelSU_Action.git
+        if git ls-remote --heads https://esureos:${{ secrets.WORKFLOW_TOKEN }}@github.com/esureos/KernelSU_Action.git ${{ env.KERNEL_SOURCE_BRANCH }} | grep -q refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}; then
+          echo "::set-output name=branch_exists::true"
+        else
+          echo "::set-output name=branch_exists::false"
+        fi
+    - name: Pull changes if branch exists
+      if: steps.check_branch.outputs.branch_exists == 'true'
+      run: |
+        git fetch origin ${{ github.event.inputs.branches }}
+        git checkout ${{ github.event.inputs.branches }}
+        git pull origin ${{ github.event.inputs.branches }}
+        git add .
+        git commit -m "Add downloaded source code"
+        git push origin ${{ github.event.inputs.branches }}
+    - name: Push new branch if not exists
+      if: steps.check_branch.outputs.branch_exists == 'false'
+      run: |
+        git checkout -b ${{ github.event.inputs.branches }}
+        git add .
+        git commit -m "Add downloaded source code"
+        git push origin ${{ github.event.inputs.branches }}
+
     - name: Upload Artifacts
       if: ${{ github.event.inputs.artifacts }} == 'true'
       uses: actions/upload-artifact@v4
@@ -116,39 +149,3 @@ jobs:
         tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}
         files: |
           ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
-    - name: Check if remote branch exists
-  id: check_branch
-  run: |
-    if git ls-remote --heads ${{ github.event.inputs.repos }} ${{ github.event.inputs.branches }} | grep -q refs/heads/${{ github.event.inputs.branches }}; then
-      echo "::set-output name=branch_exists::true"
-    else
-      echo "::set-output name=branch_exists::false"
-    fi
-
-- name: Pull changes if branch exists
-  if: steps.check_branch.outputs.branch_exists == 'true'
-  run: |
-    git fetch origin ${{ github.event.inputs.branches }}
-    git checkout ${{ github.event.inputs.branches }}
-    git pull origin ${{ github.event.inputs.branches }}
-
-- name: Push new branch if not exists
-  if: steps.check_branch.outputs.branch_exists == 'false'
-  run: |
-    git checkout -b ${{ github.event.inputs.branches }}
-    git add .
-    git commit -m "Add downloaded source code"
-    git push origin ${{ github.event.inputs.branches }}
-
-    - name: Push new branch to remote
-      if: ${{ github.event.inputs.push }} == 'true'
-      run: |
-        cd $GITHUB_WORKSPACE/android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}
-        rm -rf .git
-        git config --global init.defaultBranch main
-        git init
-        git remote add origin https://esureos:${{ secrets.WORKFLOW_TOKEN }}@github.com/esureos/KernelSU_Action.git
-        git checkout -b ${{ env.KERNEL_SOURCE_BRANCH }}
-        git add .
-        git commit -m "Add downloaded source code"
-        git push origin ${{ env.KERNEL_SOURCE_BRANCH }}
