@@ -9,6 +9,9 @@ on:
         default: 'android12-5.10-2024-03' # 默认选择标签
         type: string
 
+permissions:
+      contents: write
+
 jobs:
   download:
     permissions:
