@@ -85,14 +85,13 @@ jobs:
       run: |
         echo "KERNEL_SOURCE=${{ github.event.inputs.repos }}" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.branches }}" >> $GITHUB_ENV
-    - name: Set Environment Variables
-      id: set-env-vars
+    - name: Read the Configuration
+      if: ${{ github.event.push }}
       run: |
-        # 获取发生更改的文件列表
-        CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-
-        # 设置环境变量，将文件列表传递给其他步骤
-        echo "CHANGED_FILES=${CHANGED_FILES}" >> $GITHUB_ENV
+        CONFIG_ENV=
+        echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+    
     - name: Download Source Code
       run: |
         mkdir android-kernel && cd android-kernel
