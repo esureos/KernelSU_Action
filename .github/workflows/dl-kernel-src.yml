@@ -37,7 +37,8 @@ jobs:
     - name: Push new branch to remote
       run: |
         cd $GITHUB_WORKSPACE//android-kernel/common
-        git remote rm origin
+        rm -rf .git
+        git init
         git remote add origin https://github.com/esureos/KernelSU_Action
         git checkout -b ${{ env.KERNEL_SOURCE_BRANCH }}
         git add .
