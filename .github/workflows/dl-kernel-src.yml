@@ -6,7 +6,7 @@ on:
       version:
         description: 'Input a Kernel Version'
         required: false
-        default: 'android1-5.10-2024-03' # 默认选择标签
+        default: 'android12-5.10-2024-03' # 默认选择标签
         type: string
 
 jobs:
