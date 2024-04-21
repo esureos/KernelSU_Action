@@ -40,7 +40,7 @@ jobs:
         CONFIG_ENV=config.env
         echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
     - name: Read the Configuration
-      if: github.event_name == 'workflow_dispatch'
+      if: if [[ -n ${{ github.event.inputs.config }} ]]; then
       run: |
         CONFIG_ENV=${{ github.event.inputs.config }}
         echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
