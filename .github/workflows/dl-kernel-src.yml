@@ -77,6 +77,10 @@ jobs:
         ref: main
         fetch-depth: 0 # 获取所有历史
 
+    - name: Find Changed File
+      run: |
+        set +x
+        bash .github/scripts/find_changed_file.sh
     - name: Set GITHUB_ENV based on changed file
       if: github.event_name == 'push'
       run: |
