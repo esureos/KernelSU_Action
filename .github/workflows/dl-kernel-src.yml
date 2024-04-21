@@ -116,6 +116,30 @@ jobs:
         tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}
         files: |
           ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
+    - name: Check if remote branch exists
+  id: check_branch
+  run: |
+    if git ls-remote --heads ${{ github.event.inputs.repos }} ${{ github.event.inputs.branches }} | grep -q refs/heads/${{ github.event.inputs.branches }}; then
+      echo "::set-output name=branch_exists::true"
+    else
+      echo "::set-output name=branch_exists::false"
+    fi
+
+- name: Pull changes if branch exists
+  if: steps.check_branch.outputs.branch_exists == 'true'
+  run: |
+    git fetch origin ${{ github.event.inputs.branches }}
+    git checkout ${{ github.event.inputs.branches }}
+    git pull origin ${{ github.event.inputs.branches }}
+
+- name: Push new branch if not exists
+  if: steps.check_branch.outputs.branch_exists == 'false'
+  run: |
+    git checkout -b ${{ github.event.inputs.branches }}
+    git add .
+    git commit -m "Add downloaded source code"
+    git push origin ${{ github.event.inputs.branches }}
+
     - name: Push new branch to remote
       if: ${{ github.event.inputs.push }} == 'true'
       run: |
