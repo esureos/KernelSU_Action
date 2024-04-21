@@ -1,6 +1,12 @@
 name: Download Kernel Source Code
 
 on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'config.env'
+      - 'config.gki.env'
   workflow_dispatch:
     inputs:
       config:
@@ -79,7 +85,14 @@ jobs:
       run: |
         echo "KERNEL_SOURCE=${{ github.event.inputs.repos }}" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.branches }}" >> $GITHUB_ENV
+    - name: Set Environment Variables
+      id: set-env-vars
+      run: |
+        # 获取发生更改的文件列表
+        CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
 
+        # 设置环境变量，将文件列表传递给其他步骤
+        echo "CHANGED_FILES=${CHANGED_FILES}" >> $GITHUB_ENV
     - name: Download Source Code
       run: |
         mkdir android-kernel && cd android-kernel
