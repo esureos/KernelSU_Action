@@ -89,8 +89,8 @@ jobs:
         else
           echo "No File Changed, Use Default Config"
         fi
-        echo "KERNEL_SOURCE=$(cat $env.CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
-        echo "KERNEL_SOURCE_BRANCH=$(cat $env.CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_SOURCE=$(cat ${{ env.CONFIG_ENV }} | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_SOURCE_BRANCH=$(cat ${{ env.CONFIG_ENV }} | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
     - name: Read the Configuration
       if: ${{ github.event.inputs.config != '' }}
       run: |
