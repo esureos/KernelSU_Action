@@ -20,26 +20,26 @@ jobs:
       with:
         ref: main
     - name: Read the Configuration
-      if: if [[ -n ${{ github.event.inputs.version }} ]]; then
+      if: ${{ github.event.inputs.version }}
       run: |
-        echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.version }}
+        echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.version }}" >> $GITHUB_ENV
     - name: Download Source Code
       id: code
       run: |
         sudo apt-get update && sudo apt-get upgrade -y
         mkdir $GITHUB_WORKSPACE/android-kernel && cd $GITHUB_WORKSPACE/android-kernel
-        aria2c https://android.googlesource.com/kernel/common/+archive/refs/heads/${{ KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ KERNEL_SOURCE_BRANCH }}.tar.gz
+        aria2c https://android.googlesource.com/kernel/common/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ KERNEL_SOURCE_BRANCH }}
+        name: ${{ env.KERNEL_SOURCE_BRANCH }}
         path: |
-          ./android-kernel/${{ KERNEL_SOURCE_BRANCH }}.tar.gz
+          ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
 
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ KERNEL_SOURCE_BRANCH }}
+        tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}
         files: |
-          ./android-kernel/${{ KERNEL_SOURCE_BRANCH }}.tar.gz
+          ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
