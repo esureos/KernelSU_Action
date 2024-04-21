@@ -27,7 +27,7 @@ on:
       artifacts:
         description: 'if Upload Artifacts'
         required: false
-        default: '' # 默认选择标签
+        default: 'true' # 默认选择标签
         type: string
       releases:
         description: 'if Publish Release'
