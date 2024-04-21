@@ -32,11 +32,11 @@ jobs:
     - name: Download Source Code
       run: |
         mkdir android-kernel && cd android-kernel
-        git clone --depth=1 https://android.googlesource.com/kernel/common.git -b ${{ env.KERNEL_SOURCE_BRANCH }} ${{ env.KERNEL_SOURCE_BRANCH }}
+        git clone --depth=1 https://android.googlesource.com/kernel/common.git -b ${{ env.KERNEL_SOURCE_BRANCH }}
         aria2c https://android.googlesource.com/kernel/common/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
     - name: Push new branch to remote
       run: |
-        cd ${{ env.KERNEL_SOURCE_BRANCH }}
+        cd $GITHUB_WORKSPACE//android-kernel/common
         git remote rm origin
         git remote add origin https://github.com/esureos/KernelSU_Action
         git checkout -b ${{ env.KERNEL_SOURCE_BRANCH }}
@@ -48,10 +48,10 @@ jobs:
       with:
         name: ${{ env.KERNEL_SOURCE_BRANCH }}
         path: |
-          ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
+          $GITHUB_WORKSPACE/android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
     - name: Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}
         files: |
-          ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
+          $GITHUB_WORKSPACE/android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
