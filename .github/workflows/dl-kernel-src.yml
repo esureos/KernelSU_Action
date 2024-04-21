@@ -84,7 +84,7 @@ jobs:
       run: |
         mkdir android-kernel && cd android-kernel
         git clone --depth=1 ${{ env.KERNEL_SOURCE }}.git -b ${{ env.KERNEL_SOURCE_BRANCH }} ${{ env.KERNEL_SOURCE_BRANCH }}
-        aria2c ${{ env.KERNEL_SOURCE_BRANCH }}/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
+        aria2c ${{ env.KERNEL_SOURCE }}/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
     - name: Upload Artifacts
       if: ${{ github.event.inputs.artifacts }} == 'true'
       uses: actions/upload-artifact@v4
