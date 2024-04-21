@@ -3,10 +3,26 @@ name: Download Kernel Source Code
 on:
   workflow_dispatch:
     inputs:
+      config:
+        description: 'Choose a env Config'
+        required: false
+        default: '' # 默认选择标签
+        options:
+          - ''
+          - 'config.env'
+          - 'config.gki.env'
+          - 'config.rubens.env'
+          - 'config.ginkgo.env'
+        type: string
       version:
         description: 'Input a Kernel Version'
         required: false
-        default: 'android12-5.10-2024-03' # 默认选择标签
+        default: '' # 默认选择标签
+        type: string
+      branches:
+        description: 'Input a Branche Name'
+        required: false
+        default: '' # 默认选择标签
         type: string
 
 permissions:
@@ -14,49 +30,57 @@ permissions:
 
 jobs:
   download:
-    permissions:
-      contents: write
     name: Download by ${{ github.actor }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.WORKFLOW_TOKEN }}
-        ref: main
-    - name: Read the Configuration
-      if: ${{ github.event.inputs.version }}
-      run: |
-        echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.version }}" >> $GITHUB_ENV
     - name: Setup Environment
       run: |
         cd $GITHUB_WORKSPACE
         sudo apt-get update && sudo apt-get upgrade -y
         git config --global user.name 'esureos'
         git config --global user.email 'etosercc@gmail.com'
+    - name: Checkout
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.WORKFLOW_TOKEN }}
+        ref: main
+    - name: Read the Configuration
+      if: ${{ github.event.inputs.config }}
+      run: |
+        CONFIG_ENV=${{ github.event.inputs.config }}
+        echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+        echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
+    - name: Read the Configuration
+      if: ${{ github.event.inputs.version }}
+      run: |
+        echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.version }}" >> $GITHUB_ENV
     - name: Download Source Code
       run: |
         mkdir android-kernel && cd android-kernel
         git clone --depth=1 https://android.googlesource.com/kernel/common.git -b ${{ env.KERNEL_SOURCE_BRANCH }}
         aria2c https://android.googlesource.com/kernel/common/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.KERNEL_SOURCE_BRANCH }}
+        path: |
+          ./android-kernel/common
+          ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}
+        files: |
+          ./android-kernel/common
+          ./android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
     - name: Push new branch to remote
       run: |
-        cd $GITHUB_WORKSPACE//android-kernel/common
+        cd $GITHUB_WORKSPACE/android-kernel/common
         rm -rf .git
+        git config --global init.defaultBranch main
         git init
         git remote add origin https://esureos:${{ secrets.WORKFLOW_TOKEN }}@github.com/esureos/KernelSU_Action.git
         git checkout -b ${{ env.KERNEL_SOURCE_BRANCH }}
         git add .
         git commit -m "Add downloaded source code"
         git push origin ${{ env.KERNEL_SOURCE_BRANCH }}
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ env.KERNEL_SOURCE_BRANCH }}
-        path: |
-          $GITHUB_WORKSPACE/android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
-    - name: Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ env.KERNEL_SOURCE_BRANCH }}
-        files: |
-          $GITHUB_WORKSPACE/android-kernel/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
