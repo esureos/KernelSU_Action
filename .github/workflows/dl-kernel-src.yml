@@ -63,13 +63,6 @@ jobs:
     name: Download by ${{ github.actor }}
     runs-on: ubuntu-latest
     steps:
-    - name: Setup Environment
-      run: |
-        cd $GITHUB_WORKSPACE
-        sudo apt-get update && sudo apt-get upgrade -y
-        git config --global user.name 'esureos'
-        git config --global user.email 'etosercc@gmail.com'
-        git config --global init.defaultBranch main
     - name: Checkout
       uses: actions/checkout@v4
       with:
@@ -81,6 +74,15 @@ jobs:
       run: |
         set +x
         bash .github/scripts/find_changed_file.sh
+
+    - name: Setup Environment
+      run: |
+        cd $GITHUB_WORKSPACE
+        sudo apt-get update && sudo apt-get upgrade -y
+        git config --global user.name 'esureos'
+        git config --global user.email 'etosercc@gmail.com'
+        git config --global init.defaultBranch main
+
     - name: Set GITHUB_ENV based on changed file
       if: github.event_name == 'push'
       run: |
