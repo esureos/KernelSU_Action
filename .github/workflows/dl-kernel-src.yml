@@ -74,6 +74,7 @@ jobs:
       with:
         token: ${{ secrets.WORKFLOW_TOKEN }}
         ref: main
+        fetch-depth: 0 # 获取所有历史
     - name: Read the Configuration
       if: ${{ github.event.inputs.config }}
       run: |
