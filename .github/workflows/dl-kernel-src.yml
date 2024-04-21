@@ -66,7 +66,7 @@ jobs:
     - name: Setup Environment
       run: |
         cd $GITHUB_WORKSPACE
-        sudo apt-get update && sudo apt-get install git aria -y
+        sudo apt-get update && sudo apt-get upgrade -y
         git config --global user.name 'esureos'
         git config --global user.email 'etosercc@gmail.com'
         git config --global init.defaultBranch main
