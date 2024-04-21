@@ -109,7 +109,7 @@ jobs:
         git clone --depth=1 ${{ env.KERNEL_SOURCE }}.git -b ${{ env.KERNEL_SOURCE_BRANCH }} ${{ env.KERNEL_SOURCE_BRANCH }}
         aria2c ${{ env.KERNEL_SOURCE }}/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
         echo "dl_complete=true" >> $GITHUB_OUTPUT
-        cat ${{ output.dl_complete }}
+        cat ${{ steps.dl.outputs.dl_complete }}
 
     - name: Check if remote branch exists
       if: ${{ github.event.inputs.push == 'true' && steps.dl.outputs.dl_complete == 'true' }}
