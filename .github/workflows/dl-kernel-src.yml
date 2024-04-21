@@ -69,10 +69,11 @@ jobs:
         echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
     - name: Read the Configuration
-      if: ${{ github.event.inputs.repos }} && ${{ github.event.inputs.branches }}
+      if: ${{ github.event.inputs.repos != '' && github.event.inputs.branches != '' }}
       run: |
         echo "KERNEL_SOURCE=${{ github.event.inputs.repos }}" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=${{ github.event.inputs.branches }}" >> $GITHUB_ENV
+
     - name: Download Source Code
       run: |
         mkdir android-kernel && cd android-kernel
