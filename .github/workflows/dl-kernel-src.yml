@@ -38,13 +38,11 @@ jobs:
       if: github.event_name == 'push'
       run: |
         CONFIG_ENV=config.env
-        echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
     - name: Read the Configuration
       if: github.event_name == 'workflow_dispatch'
       run: |
         CONFIG_ENV=${{ github.event.inputs.config }}
-        echo "KERNEL_SOURCE=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
         echo "KERNEL_SOURCE_BRANCH=$(cat $CONFIG_ENV | grep -w "KERNEL_SOURCE_BRANCH" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
     - name: Read the Configuration
       if: if [[ -n ${{ github.event.inputs.version }} ]]; then
@@ -55,7 +53,7 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get upgrade -y
         mkdir $GITHUB_WORKSPACE/android-kernel && cd $GITHUB_WORKSPACE/android-kernel
-        aria2c ${{ env.KERNEL_SOURCE }}/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
+        aria2c https://android.googlesource.com/kernel/common/+archive/refs/heads/${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz -o ${{ env.KERNEL_SOURCE_BRANCH }}.tar.gz
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
