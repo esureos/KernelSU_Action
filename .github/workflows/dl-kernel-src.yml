@@ -5,8 +5,8 @@ on:
     branches:
       - 'main'
     paths:
-      - 'config.env'
-      - 'config.gki.env'
+      - 'config.env.bak'
+      - 'config.gki.env.bak'
   workflow_dispatch:
     inputs:
       config:
@@ -14,7 +14,6 @@ on:
         required: false
         default: '' # 默认选择标签
         options:
-          - ''
           - 'config.env'
           - 'config.gki.env'
           - 'config.rubens.env'
@@ -70,15 +69,9 @@ jobs:
         ref: main
         fetch-depth: 0 # 获取所有历史
 
-    - name: Find Changed File
-      run: |
-        set +x
-        bash .github/scripts/find_changed_file.sh
-
-    - name: Setup Environment
+    - name: Setup Git Config
       run: |
         cd $GITHUB_WORKSPACE
-        sudo apt-get update && sudo apt-get upgrade -y
         git config --global user.name 'esureos'
         git config --global user.email 'etosercc@gmail.com'
         git config --global init.defaultBranch main

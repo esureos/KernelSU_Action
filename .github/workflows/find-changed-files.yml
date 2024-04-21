@@ -1,1 +1,29 @@
+name: Download Kernel Source Code
 
+on:
+  push:
+
+permissions:
+  contents: write
+
+jobs:
+  find:
+    name: Find Changed Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          ref: main
+          fetch-depth: 0 # 获取所有历史
+  
+      - name: Find Changed File
+        run: |
+          set +x
+          bash .github/scripts/find_changed_file.sh
+
+      - name: Find Changed Files
+        run: |
+          set +x
+          bash .github/scripts/find_changed_files.sh
