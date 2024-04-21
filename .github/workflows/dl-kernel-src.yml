@@ -43,7 +43,7 @@ jobs:
         cd $GITHUB_WORKSPACE//android-kernel/common
         rm -rf .git
         git init
-        git remote add origin git@github.com:esureos/KernelSU_Action.git
+        git remote add origin https://github.com/esureos/KernelSU_Action.git
         git checkout -b ${{ env.KERNEL_SOURCE_BRANCH }}
         git add .
         git commit -m "Add downloaded source code"
