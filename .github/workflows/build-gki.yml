@@ -1,0 +1,38 @@
+name: Build GKI Kernel
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'beta'
+      - 'dev'
+    paths:
+      - 'config.gki.env'
+      - 'config.gki_ksu.env'
+      - 'config.gki_lxcd.env'
+      - 'config.gki_ksulxcd.env'
+  workflow_dispatch:
+    inputs:
+      sources:
+        default: ''
+        type: string
+      branches:
+        default: ''
+        type: string
+
+permission:
+  write
+  read
+
+jobs:
+  name: Build GKI Kernel
+  runs-on: ubuntu-laste
+  steps:
+    - name: checkout
+      uses: action/checkout@v4
+      with:
+        token: ${{ secrets.WORKFLOW_TOKEN }}
+        ref: main
+    - name: check kernel source
+      run: |
+        
