@@ -20,19 +20,20 @@ on:
         default: ''
         type: string
 
-permission:
+permissions:
   write
   read
 
 jobs:
-  name: Build GKI Kernel
-  runs-on: ubuntu-laste
-  steps:
-    - name: checkout
-      uses: action/checkout@v4
-      with:
-        token: ${{ secrets.WORKFLOW_TOKEN }}
-        ref: main
-    - name: check kernel source
-      run: |
+  build:
+    name: Build GKI Kernel
+    runs-on: ubuntu-laste
+    steps:
+      - name: checkout
+        uses: action/checkout@v4
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          ref: main
+      - name: check kernel source
+        run: |
         
